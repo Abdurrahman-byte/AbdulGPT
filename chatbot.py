@@ -1,27 +1,35 @@
+import os
+from flask import Flask, render_template, request, jsonify
 from groq import Groq
+
+app = Flask(__name__)
+
 client = Groq()
 
-print("🤖 Chatbot (Groq Streaming): Type 'quit', 'exit, or 'bye', to stop\n")
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-while True:
-    user_input = input("You: ")
-    if user_input.lower() in ["quit", "exit", "bye"]:
-        print("\n 🤖 Chatbot: Goodbye")
-        break
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_message = request.json.get("message")
 
-    print("\n 🤖 Chatbot: ", end="", flush=True)
+    if not user_message:
+        return jsonify({"error": "No message provided"}), 400
 
-    stream = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "You are a helpful chatbot"},
-            {"role": "user", "content": user_input}
-            ],
-            stream=True
-    )
+    try: 
+         completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are a helpful chatbot"},
+                    {"role": "user", "content": user_message}
+                    ]
+                    
+            )
+         bot_response =completion.choices[0].message.content
+         return jsonify({"response": bot_response})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    for chunk in stream:
-        if chunk.choices[0].delta.content:
-            print(chunk.choices[0].delta.content, end="", flush=True)
-
-    print()        
+if __name__ == "__main__":
+    app.run(debug=True)    
