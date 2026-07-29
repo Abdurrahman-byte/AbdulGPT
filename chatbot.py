@@ -12,36 +12,34 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json or {}
-    user_message = data.get("message", "")
+    messages = data.get("messages", [])
     image_base64 = data.get("image", None)
     
-    if not user_message and not image_base64:
-        return jsonify({"error": "No message or file provided"}), 400
+    if not messages:
+        return jsonify({"error": "No messages provided"}), 400
 
     try:
-        
         if image_base64:
             model = "qwen/qwen3.6-27b"
+            
+            latest_message = messages.pop()  
             content = []
-            if user_message:
-                content.append({"type": "text", "text": user_message})
-            else:
-                content.append({"type": "text", "text": "Describe or analyze this image."})
-                
+            if latest_message["content"]:
+                content.append({"type": "text", "text": latest_message["content"]})
             content.append({
                 "type": "image_url",
                 "image_url": {"url": image_base64}
             })
-            
-            messages = [{"role": "user", "content": content}]
+            messages.append({"role": "user", "content": content})
         else:
-            
             model = "llama-3.3-70b-versatile"
-            messages = [{"role": "user", "content": user_message}]
+
+        
+        full_conversation = [{"role": "system", "content": "You are a helpful and concise AI assistant."}] + messages
 
         completion = client.chat.completions.create(
             model=model,
-            messages=messages
+            messages=full_conversation
         )
         
         bot_response = completion.choices[0].message.content
