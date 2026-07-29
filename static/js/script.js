@@ -20,7 +20,7 @@ let attachedImageBase64 = null;
 let attachedTextContent = null;
 
 
-// 2. Theme Toggle Logic (Light / Dark Mode)
+// 2. Theme Toggle (Light / Dark Mode)
 
 function initTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -41,7 +41,7 @@ themeToggleBtn.addEventListener('click', () => {
 
 initTheme();
 
-// 3. File Attachment Logic
+// 3. File Attachment 
 
 attachBtn.addEventListener('click', () => fileInput.click());
 
