@@ -1,0 +1,60 @@
+/* static/css/style.css */
+
+/* Bot Markdown Output Formatting */
+.bot-markdown-content p {
+  margin-bottom: 0.75rem;
+}
+
+.bot-markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.bot-markdown-content ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.bot-markdown-content ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.bot-markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.bot-markdown-content strong {
+  font-weight: 600;
+}
+
+.bot-markdown-content h1, 
+.bot-markdown-content h2, 
+.bot-markdown-content h3 {
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.bot-markdown-content code {
+  background-color: rgba(120, 120, 120, 0.15);
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.85em;
+}
+
+.bot-markdown-content pre {
+  background-color: #18181b;
+  color: #f4f4f5;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.bot-markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
