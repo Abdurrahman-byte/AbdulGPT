@@ -22,7 +22,9 @@ from routes.upload import upload_bp
 from routes.auth import auth_bp
 
 load_dotenv()
+
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback-dev-key")
 
 
 app.register_blueprint(chat_bp)
