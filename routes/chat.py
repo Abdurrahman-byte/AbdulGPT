@@ -9,6 +9,11 @@ chat_bp = Blueprint("chat",
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
+    user_id =session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized. please log in"}), 401
+    
     data = request.json or {}
     messages = data.get("messages") or []
     image_base64 = data.get("image", None)
@@ -46,7 +51,7 @@ def chat():
             user_message = str(latest_content)
 
         
-        save_chat(user_message, bot_response, session_id=session_id)
+        save_chat(user_id, session_id, user_message, bot_response)
 
         return jsonify({"response": bot_response})
 

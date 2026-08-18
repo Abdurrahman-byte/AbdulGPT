@@ -149,5 +149,49 @@
 
     <!-- Application JavaScript File -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Auth Modal Backdrop -->
+<div id="auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl w-full max-w-md p-6 shadow-xl">
+    
+    <!-- Modal Header / Tabs -->
+    <div class="flex border-b border-gray-200 dark:border-zinc-800 mb-6">
+      <button id="tab-login-btn" class="flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition">Log In</button>
+      <button id="tab-register-btn" class="flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">Username</label>
+        <input type="text" id="login-username" required class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-zinc-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Enter username">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">Password</label>
+        <input type="password" id="login-password" required class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-zinc-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="••••••••">
+      </div>
+      <p id="auth-error" class="text-xs text-red-500 hidden"></p>
+      <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl text-sm transition">Log In</button>
+    </form>
+
+    <!-- Register Form (Hidden by Default) -->
+    <form id="register-form" class="space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">Username</label>
+        <input type="text" id="reg-username" required class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-zinc-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Choose username">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">Email (Optional)</label>
+        <input type="email" id="reg-email" class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-zinc-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="you@example.com">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">Password</label>
+        <input type="password" id="reg-password" required class="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-zinc-700 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="••••••••">
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-xl text-sm transition">Create Account</button>
+    </form>
+
+  </div>
+</div>
 </body>
 </html>
