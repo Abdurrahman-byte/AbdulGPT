@@ -17,111 +17,115 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeSidebarBtn = document.getElementById('close-sidebar-btn');
   const sidebar = document.getElementById('sidebar');
   const sidebarOverlay = document.getElementById('sidebar-overlay');
-  // --- Auth UI Management ---
-const authModal = document.getElementById('auth-modal');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const tabLoginBtn = document.getElementById('tab-login-btn');
-const tabRegisterBtn = document.getElementById('tab-register-btn');
-const authError = document.getElementById('auth-error');
 
-// Tab Switching
-tabLoginBtn?.addEventListener('click', () => {
-  tabLoginBtn.className = 'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
-  tabRegisterBtn.className = 'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
-  loginForm.classList.remove('hidden');
-  registerForm.classList.add('hidden');
-  authError.classList.add('hidden');
-});
+  // Auth UI Elements
+  const authModal = document.getElementById('auth-modal');
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  const tabLoginBtn = document.getElementById('tab-login-btn');
+  const tabRegisterBtn = document.getElementById('tab-register-btn');
+  const authError = document.getElementById('auth-error');
 
-tabRegisterBtn?.addEventListener('click', () => {
-  tabRegisterBtn.className = 'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
-  tabLoginBtn.className = 'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
-  registerForm.classList.remove('hidden');
-  loginForm.classList.add('hidden');
-  authError.classList.add('hidden');
-});
+  // Tab Switching
+  tabLoginBtn?.addEventListener('click', () => {
+    tabLoginBtn.className =
+        'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
+    tabRegisterBtn.className =
+        'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+    authError.classList.add('hidden');
+  });
 
-// Check auth state on load
-checkAuth();
+  tabRegisterBtn?.addEventListener('click', () => {
+    tabRegisterBtn.className =
+        'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
+    tabLoginBtn.className =
+        'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    authError.classList.add('hidden');
+  });
 
-async function checkAuth() {
-  try {
-    const res = await fetch('/api/me');
-    if (res.ok) {
-      authModal.classList.add('hidden');
-      loadSessions();
-      loadHistory(currentSessionId);
-    } else {
+  // Check Auth State
+  checkAuth();
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/me');
+      if (res.ok) {
+        authModal.classList.add('hidden');
+        loadSessions();
+        loadHistory(currentSessionId);
+      } else {
+        authModal.classList.remove('hidden');
+      }
+    } catch (err) {
       authModal.classList.remove('hidden');
     }
-  } catch (err) {
-    authModal.classList.remove('hidden');
   }
-}
 
-// Handle Login Submission
-loginForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.classList.add('hidden');
+  // Handle Login Submission
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError.classList.add('hidden');
 
-  const username = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
 
-  try {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const data = await res.json();
 
-    if (res.ok) {
-      authModal.classList.add('hidden');
-      loadSessions();
-      loadHistory(currentSessionId);
-    } else {
-      authError.textContent = data.error || 'Login failed';
+      if (res.ok) {
+        authModal.classList.add('hidden');
+        loadSessions();
+        loadHistory(currentSessionId);
+      } else {
+        authError.textContent = data.error || 'Login failed';
+        authError.classList.remove('hidden');
+      }
+    } catch (err) {
+      authError.textContent = 'Server connection error';
       authError.classList.remove('hidden');
     }
-  } catch (err) {
-    authError.textContent = 'Server connection error';
-    authError.classList.remove('hidden');
-  }
-});
+  });
 
-// Handle Registration Submission
-registerForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.classList.add('hidden');
+  // Handle Registration Submission
+  registerForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError.classList.add('hidden');
 
-  const username = document.getElementById('reg-username').value;
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
+    const username = document.getElementById('reg-username').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
 
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password })
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, email, password})
+      });
 
-    if (res.ok) {
-      // Auto login after register
-      tabLoginBtn.click();
-      document.getElementById('login-username').value = username;
-      document.getElementById('login-password').value = password;
-      loginForm.dispatchEvent(new Event('submit'));
-    } else {
-      authError.textContent = data.error || 'Registration failed';
+      if (res.ok) {
+        tabLoginBtn.click();
+        document.getElementById('login-username').value = username;
+        document.getElementById('login-password').value = password;
+        loginForm.dispatchEvent(new Event('submit'));
+      } else {
+        const data = await res.json();
+        authError.textContent = data.error || 'Registration failed';
+        authError.classList.remove('hidden');
+      }
+    } catch (err) {
+      authError.textContent = 'Server connection error';
       authError.classList.remove('hidden');
     }
-  } catch (err) {
-    authError.textContent = 'Server connection error';
-    authError.classList.remove('hidden');
-  }
-});
+  });
 
   // State Variables
   let currentSessionId =
@@ -131,12 +135,12 @@ registerForm?.addEventListener('submit', async (e) => {
   let conversationHistory = [];
   let currentAttachment = null;
 
-  // --- Initialization ---
+  // Initialization
   initTheme();
   loadSessions();
   loadHistory(currentSessionId);
 
-  // --- Auto-Resize & Enter key ---
+  // Auto-Resize Textarea
   userInput.addEventListener('input', () => {
     userInput.style.height = 'auto';
     userInput.style.height = `${Math.min(userInput.scrollHeight, 160)}px`;
@@ -149,7 +153,7 @@ registerForm?.addEventListener('submit', async (e) => {
     }
   });
 
-  // --- Theme Controls ---
+  // Theme Controls
   function initTheme() {
     const isDark = localStorage.getItem('theme') !== 'light';
     if (isDark) {
@@ -169,7 +173,7 @@ registerForm?.addEventListener('submit', async (e) => {
     });
   }
 
-  // --- File Attachments ---
+  // File Attachments
   if (attachBtn) attachBtn.addEventListener('click', () => fileInput.click());
 
   if (fileInput) {
@@ -184,8 +188,8 @@ registerForm?.addEventListener('submit', async (e) => {
         showPreview(file.name, 'Uploading...');
 
         const res = await fetch('/upload', {method: 'POST', body: formData});
-
         const contentType = res.headers.get('content-type');
+
         if (!contentType || !contentType.includes('application/json')) {
           if (res.status === 413) {
             throw new Error('File is too large! Max limit is 32MB.');
@@ -240,7 +244,7 @@ registerForm?.addEventListener('submit', async (e) => {
     if (filePreviewName) filePreviewName.textContent = '';
   }
 
-  // --- Message UI Rendering ---
+  // Message Rendering
   function escapeHtml(str) {
     return str.replace(
         /[&<>"']/g,
@@ -260,50 +264,55 @@ registerForm?.addEventListener('submit', async (e) => {
     if (attachment) {
       if (attachment.type === 'image') {
         attachmentHtml = `
-                    <div class="mb-2">
-                        <img src="${
+          <div class="mb-2">
+            <img src="${
             attachment
                 .data}" alt="Uploaded Image" class="max-w-xs max-h-48 rounded-xl object-cover border border-zinc-300 dark:border-zinc-700 shadow-sm" />
-                    </div>`;
+          </div>`;
       } else {
         attachmentHtml = `
-                    <div class="mb-2 flex items-center gap-2 bg-emerald-700/80 text-white px-3 py-2 rounded-xl text-xs max-w-xs shadow-sm">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                        <span class="truncate font-medium">${
+          <div class="mb-2 flex items-center gap-2 bg-emerald-700/80 text-white px-3 py-2 rounded-xl text-xs max-w-xs shadow-sm">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span class="truncate font-medium">${
             escapeHtml(attachment.name)}</span>
-                    </div>`;
+          </div>`;
       }
     }
 
     const displayText =
         text.trim() ? `<div>${escapeHtml(text)}</div>` : '';
     messageDiv.innerHTML = `
-            ${attachmentHtml}
-            ${
+      ${attachmentHtml}
+      ${
         displayText ?
             `<div class="bg-emerald-600 text-white p-3.5 px-4 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm">${
                 displayText}</div>` :
             ''}
-        `;
+    `;
 
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  function appendBotMessage(text) {
+  function createBotMessageContainer() {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'flex items-start max-w-3xl mb-4';
 
-    const parsedContent =
-        typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
-    messageDiv.innerHTML = `
-            <div class="bot-markdown-content flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm">
-                ${parsedContent}
-            </div>
-        `;
+    const contentDiv = document.createElement('div');
+    contentDiv.className =
+        'bot-markdown-content flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm';
 
+    messageDiv.appendChild(contentDiv);
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    return contentDiv;
+  }
+
+  function appendBotMessage(text) {
+    const contentDiv = createBotMessageContainer();
+    contentDiv.innerHTML =
+        typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
   }
 
   function appendLoadingIndicator() {
@@ -311,10 +320,10 @@ registerForm?.addEventListener('submit', async (e) => {
     loadingDiv.id = 'bot-loading';
     loadingDiv.className = 'flex items-start max-w-3xl mb-4';
     loadingDiv.innerHTML = `
-            <div class="bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-4 rounded-2xl rounded-tl-sm text-gray-500 dark:text-zinc-400 text-xs flex items-center gap-2">
-                <span class="animate-pulse">Thinking...</span>
-            </div>
-        `;
+      <div class="bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-4 rounded-2xl rounded-tl-sm text-gray-500 dark:text-zinc-400 text-xs flex items-center gap-2">
+        <span class="animate-pulse">Thinking...</span>
+      </div>
+    `;
     chatBox.appendChild(loadingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
@@ -324,7 +333,7 @@ registerForm?.addEventListener('submit', async (e) => {
     if (loadingDiv) loadingDiv.remove();
   }
 
-  // --- Submit Chat ---
+  // --- Live Stream Chat Handler ---
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -365,16 +374,38 @@ registerForm?.addEventListener('submit', async (e) => {
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
       removeLoadingIndicator();
 
-      if (data.error) {
-        appendBotMessage(`Error: ${data.error}`);
-      } else {
-        appendBotMessage(data.response);
-        conversationHistory.push({role: 'assistant', content: data.response});
-        loadSessions();
+      if (!response.ok) {
+        const errorData = await response.json();
+        appendBotMessage(`Error: ${errorData.error || 'Request failed'}`);
+        return;
       }
+
+      // Stream Reader Setup
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      const contentDiv = createBotMessageContainer();
+      let fullResponseText = '';
+
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, {stream: true});
+        fullResponseText += chunk;
+
+        contentDiv.innerHTML = typeof marked !== 'undefined' ?
+            marked.parse(fullResponseText) :
+            escapeHtml(fullResponseText);
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      conversationHistory.push(
+          {role: 'assistant', content: fullResponseText});
+      loadSessions();
+
     } catch (err) {
       removeLoadingIndicator();
       appendBotMessage('Error: Could not reach the server.');
@@ -382,7 +413,7 @@ registerForm?.addEventListener('submit', async (e) => {
     }
   });
 
-  // --- Session & History Management ---
+  // Session & History Management
   async function loadSessions() {
     try {
       const res = await fetch('/api/sessions');
@@ -410,10 +441,10 @@ registerForm?.addEventListener('submit', async (e) => {
             'opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition rounded';
         delBtn.title = 'Delete thread';
         delBtn.innerHTML = `
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                `;
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        `;
         delBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           deleteSession(s.session_id);
@@ -463,12 +494,12 @@ registerForm?.addEventListener('submit', async (e) => {
 
       if (history.length === 0) {
         chatBox.innerHTML = `
-                    <div class="flex items-start max-w-3xl mb-4">
-                        <div class="flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm">
-                            Hello! I'm <strong>AbdulGPT</strong>. Ask me questions, upload code files, attach images, or upload PDFs for instant analysis.
-                        </div>
-                    </div>
-                `;
+          <div class="flex items-start max-w-3xl mb-4">
+            <div class="flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm">
+              Hello! I'm <strong>AbdulGPT</strong>. Ask me questions, upload code files, attach images, or upload PDFs for instant analysis.
+            </div>
+          </div>
+        `;
         return;
       }
 
@@ -500,7 +531,7 @@ registerForm?.addEventListener('submit', async (e) => {
     });
   }
 
-  // --- Mobile Sidebar Controls ---
+  // Mobile Sidebar Controls
   function openMobileSidebar() {
     if (sidebar) sidebar.classList.remove('-translate-x-full');
     if (sidebarOverlay) sidebarOverlay.classList.remove('hidden');

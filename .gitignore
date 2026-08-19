@@ -1,6 +1,21 @@
+# Environment & Secret variables
 .env
+*.env
+
+# Python build & cache files
 __pycache__/
+*.py[cod]
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# SQLite Databases & Flask Instance folder
 *.db
 *.sqlite
 *.sqlite3
 instance/
+
+# VS Code directory settings (optional)
+.vscode/
