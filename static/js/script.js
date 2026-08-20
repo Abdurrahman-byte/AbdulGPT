@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
     tabRegisterBtn.className =
         'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
-    loginForm.classList.remove('hidden');
-    registerForm.classList.add('hidden');
-    authError.classList.add('hidden');
+    loginForm?.classList.remove('hidden');
+    registerForm?.classList.add('hidden');
+    authError?.classList.add('hidden');
   });
 
   tabRegisterBtn?.addEventListener('click', () => {
@@ -42,89 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'flex-1 pb-3 text-sm font-semibold text-emerald-600 border-b-2 border-emerald-600 transition';
     tabLoginBtn.className =
         'flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-200 border-b-2 border-transparent transition';
-    registerForm.classList.remove('hidden');
-    loginForm.classList.add('hidden');
-    authError.classList.add('hidden');
-  });
-
-  // Check Auth State
-  checkAuth();
-
-  async function checkAuth() {
-    try {
-      const res = await fetch('/api/me');
-      if (res.ok) {
-        authModal.classList.add('hidden');
-        loadSessions();
-        loadHistory(currentSessionId);
-      } else {
-        authModal.classList.remove('hidden');
-      }
-    } catch (err) {
-      authModal.classList.remove('hidden');
-    }
-  }
-
-  // Handle Login Submission
-  loginForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    authError.classList.add('hidden');
-
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, password})
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        authModal.classList.add('hidden');
-        loadSessions();
-        loadHistory(currentSessionId);
-      } else {
-        authError.textContent = data.error || 'Login failed';
-        authError.classList.remove('hidden');
-      }
-    } catch (err) {
-      authError.textContent = 'Server connection error';
-      authError.classList.remove('hidden');
-    }
-  });
-
-  // Handle Registration Submission
-  registerForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    authError.classList.add('hidden');
-
-    const username = document.getElementById('reg-username').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
-
-    try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, email, password})
-      });
-
-      if (res.ok) {
-        tabLoginBtn.click();
-        document.getElementById('login-username').value = username;
-        document.getElementById('login-password').value = password;
-        loginForm.dispatchEvent(new Event('submit'));
-      } else {
-        const data = await res.json();
-        authError.textContent = data.error || 'Registration failed';
-        authError.classList.remove('hidden');
-      }
-    } catch (err) {
-      authError.textContent = 'Server connection error';
-      authError.classList.remove('hidden');
-    }
+    registerForm?.classList.remove('hidden');
+    loginForm?.classList.add('hidden');
+    authError?.classList.add('hidden');
   });
 
   // State Variables
@@ -135,23 +55,115 @@ document.addEventListener('DOMContentLoaded', () => {
   let conversationHistory = [];
   let currentAttachment = null;
 
+  // Check Auth State
+  checkAuth();
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/me');
+      if (res.ok) {
+        authModal?.classList.add('hidden');
+        loadSessions();
+        loadHistory(currentSessionId);
+      } else {
+        authModal?.classList.remove('hidden');
+      }
+    } catch (err) {
+      authModal?.classList.remove('hidden');
+    }
+  }
+
+  // Handle Login Submission
+  loginForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError?.classList.add('hidden');
+
+    const username = document.getElementById('login-username')?.value;
+    const password = document.getElementById('login-password')?.value;
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        authModal?.classList.add('hidden');
+        loadSessions();
+        loadHistory(currentSessionId);
+      } else {
+        if (authError) {
+          authError.textContent = data.error || 'Login failed';
+          authError.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      if (authError) {
+        authError.textContent = 'Server connection error';
+        authError.classList.remove('hidden');
+      }
+    }
+  });
+
+  // Handle Registration Submission
+  registerForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError?.classList.add('hidden');
+
+    const username = document.getElementById('reg-username')?.value;
+    const email = document.getElementById('reg-email')?.value;
+    const password = document.getElementById('reg-password')?.value;
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, email, password})
+      });
+
+      if (res.ok) {
+        tabLoginBtn?.click();
+        const loginUserElem = document.getElementById('login-username');
+        const loginPassElem = document.getElementById('login-password');
+        if (loginUserElem) loginUserElem.value = username;
+        if (loginPassElem) loginPassElem.value = password;
+        loginForm?.dispatchEvent(new Event('submit'));
+      } else {
+        const data = await res.json();
+        if (authError) {
+          authError.textContent = data.error || 'Registration failed';
+          authError.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      if (authError) {
+        authError.textContent = 'Server connection error';
+        authError.classList.remove('hidden');
+      }
+    }
+  });
+
   // Initialization
   initTheme();
   loadSessions();
   loadHistory(currentSessionId);
 
   // Auto-Resize Textarea
-  userInput.addEventListener('input', () => {
-    userInput.style.height = 'auto';
-    userInput.style.height = `${Math.min(userInput.scrollHeight, 160)}px`;
-  });
+  if (userInput) {
+    userInput.addEventListener('input', () => {
+      userInput.style.height = 'auto';
+      userInput.style.height = `${Math.min(userInput.scrollHeight, 160)}px`;
+    });
 
-  userInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      chatForm.dispatchEvent(new Event('submit'));
-    }
-  });
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatForm?.dispatchEvent(new Event('submit'));
+      }
+    });
+  }
 
   // Theme Controls
   function initTheme() {
@@ -174,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // File Attachments
-  if (attachBtn) attachBtn.addEventListener('click', () => fileInput.click());
+  if (attachBtn) attachBtn.addEventListener('click', () => fileInput?.click());
 
   if (fileInput) {
     fileInput.addEventListener('change', async (e) => {
@@ -187,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         showPreview(file.name, 'Uploading...');
 
-        const res = await fetch('/upload', {method: 'POST', body: formData});
+        const res = await fetch('/api/upload', {method: 'POST', body: formData});
         const contentType = res.headers.get('content-type');
 
         if (!contentType || !contentType.includes('application/json')) {
@@ -232,9 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
     removeFileBtn.addEventListener('click', clearPreviewBar);
 
   function showPreview(filename, status = null) {
-    filePreviewName.textContent =
-        status ? `${filename} (${status})` : filename;
-    filePreviewBar.classList.remove('hidden');
+    if (filePreviewName) {
+      filePreviewName.textContent = status ? `${filename} (${status})` : filename;
+    }
+    if (filePreviewBar) {
+      filePreviewBar.classList.remove('hidden');
+    }
   }
 
   function clearPreviewBar() {
@@ -244,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filePreviewName) filePreviewName.textContent = '';
   }
 
-  // Message Rendering
+  // Helper & Rendering Functions
   function escapeHtml(str) {
     return str.replace(
         /[&<>"']/g,
@@ -256,7 +271,68 @@ document.addEventListener('DOMContentLoaded', () => {
               '\'': '&#039;'}[m]));
   }
 
+  // Escape LaTeX delimiters to protect them from standard markdown parsers
+  function preprocessLaTeX(text) {
+    return text
+      .replace(/\\\(/g, '&#92;(')
+      .replace(/\\\)/g, '&#92;)')
+      .replace(/\\\[/g, '&#92;[')
+      .replace(/\\\]/g, '&#92;]');
+  }
+
+  function postprocessLaTeX(text) {
+    return text
+      .replace(/&#92;\(/g, '\\(')
+      .replace(/&#92;\)/g, '\\)')
+      .replace(/&#92;\[/g, '\\[')
+      .replace(/&#92;\]/g, '\\]');
+  }
+
+  function renderContentWithMath(container, rawMarkdown) {
+    if (typeof marked !== 'undefined') {
+      const protectedText = preprocessLaTeX(rawMarkdown);
+      const parsedHtml = marked.parse(protectedText);
+      container.innerHTML = postprocessLaTeX(parsedHtml);
+    } else {
+      container.innerHTML = escapeHtml(rawMarkdown);
+    }
+
+    // Attach Copy Buttons to Code Blocks
+    container.querySelectorAll('pre').forEach((pre) => {
+      if (pre.querySelector('.copy-code-btn')) return;
+      
+      pre.classList.add('relative', 'group');
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-code-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-zinc-700/80 hover:bg-zinc-600 text-zinc-200 text-xs px-2 py-1 rounded transition shadow';
+      copyBtn.textContent = 'Copy';
+      
+      copyBtn.addEventListener('click', () => {
+        const codeText = pre.querySelector('code')?.innerText || pre.innerText;
+        navigator.clipboard.writeText(codeText).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+        });
+      });
+      pre.appendChild(copyBtn);
+    });
+
+    // Render KaTeX Expressions
+    if (typeof renderMathInElement !== 'undefined') {
+      renderMathInElement(container, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '\\[', right: '\\]', display: true }
+        ],
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        throwOnError: false
+      });
+    }
+  }
+
   function appendUserMessage(text, attachment = null) {
+    if (!chatBox) return;
     const messageDiv = document.createElement('div');
     messageDiv.className = 'flex flex-col items-end max-w-3xl ml-auto mb-4';
 
@@ -265,29 +341,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (attachment.type === 'image') {
         attachmentHtml = `
           <div class="mb-2">
-            <img src="${
-            attachment
-                .data}" alt="Uploaded Image" class="max-w-xs max-h-48 rounded-xl object-cover border border-zinc-300 dark:border-zinc-700 shadow-sm" />
+            <img src="${attachment.data}" alt="Uploaded Image" class="max-w-xs max-h-48 rounded-xl object-cover border border-zinc-300 dark:border-zinc-700 shadow-sm" />
           </div>`;
       } else {
         attachmentHtml = `
           <div class="mb-2 flex items-center gap-2 bg-emerald-700/80 text-white px-3 py-2 rounded-xl text-xs max-w-xs shadow-sm">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-            <span class="truncate font-medium">${
-            escapeHtml(attachment.name)}</span>
+            <span class="truncate font-medium">${escapeHtml(attachment.name)}</span>
           </div>`;
       }
     }
 
-    const displayText =
-        text.trim() ? `<div>${escapeHtml(text)}</div>` : '';
+    const displayText = text.trim() ? `<div>${escapeHtml(text)}</div>` : '';
     messageDiv.innerHTML = `
       ${attachmentHtml}
-      ${
-        displayText ?
-            `<div class="bg-emerald-600 text-white p-3.5 px-4 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm">${
-                displayText}</div>` :
-            ''}
+      ${displayText ? `<div class="bg-emerald-600 text-white p-3.5 px-4 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm">${displayText}</div>` : ''}
     `;
 
     chatBox.appendChild(messageDiv);
@@ -300,22 +368,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const contentDiv = document.createElement('div');
     contentDiv.className =
-        'bot-markdown-content flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm';
+        'bot-markdown-content flex-1 bg-gray-100 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800/80 p-4 rounded-2xl rounded-tl-sm text-gray-800 dark:text-zinc-200 text-sm leading-relaxed shadow-sm overflow-x-auto';
 
     messageDiv.appendChild(contentDiv);
-    chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    if (chatBox) {
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
     return contentDiv;
   }
 
   function appendBotMessage(text) {
     const contentDiv = createBotMessageContainer();
-    contentDiv.innerHTML =
-        typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
+    renderContentWithMath(contentDiv, text);
   }
 
   function appendLoadingIndicator() {
+    if (!chatBox) return;
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'bot-loading';
     loadingDiv.className = 'flex items-start max-w-3xl mb-4';
@@ -333,31 +403,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loadingDiv) loadingDiv.remove();
   }
 
-  // --- Live Stream Chat Handler ---
-  chatForm.addEventListener('submit', async (e) => {
+  // Live Stream Chat Handler
+  chatForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const messageText = userInput.value.trim();
+    const messageText = userInput?.value.trim() || '';
     if (!messageText && !currentAttachment) return;
 
     const attachmentToSend = currentAttachment;
-    userInput.value = '';
-    userInput.style.height = 'auto';
+    if (userInput) {
+      userInput.value = '';
+      userInput.style.height = 'auto';
+    }
     clearPreviewBar();
 
     appendUserMessage(messageText, attachmentToSend);
 
     let formattedContent = messageText;
     if (attachmentToSend && attachmentToSend.pdfText) {
-      formattedContent = `[Attached Document: ${
-          attachmentToSend
-              .name}]\n${attachmentToSend.pdfText}\n\nUser Question: ${messageText}`;
+      formattedContent = `[Attached Document: ${attachmentToSend.name}]\n${attachmentToSend.pdfText}\n\nUser Question: ${messageText}`;
     }
 
     conversationHistory.push({role: 'user', content: formattedContent});
 
-    const selectedModel =
-        modelSelect ? modelSelect.value : 'llama-3.3-70b-versatile';
+    const selectedModel = modelSelect ? modelSelect.value : 'openai/gpt-oss-120b';
     const payload = {
       session_id: currentSessionId,
       model: selectedModel,
@@ -382,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Stream Reader Setup
+      // Setup Stream Reader
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       const contentDiv = createBotMessageContainer();
@@ -395,15 +464,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const chunk = decoder.decode(value, {stream: true});
         fullResponseText += chunk;
 
-        contentDiv.innerHTML = typeof marked !== 'undefined' ?
-            marked.parse(fullResponseText) :
-            escapeHtml(fullResponseText);
+        if (typeof marked !== 'undefined') {
+          contentDiv.innerHTML = marked.parse(preprocessLaTeX(fullResponseText));
+        } else {
+          contentDiv.innerHTML = escapeHtml(fullResponseText);
+        }
 
-        chatBox.scrollTop = chatBox.scrollHeight;
+        if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
       }
 
-      conversationHistory.push(
-          {role: 'assistant', content: fullResponseText});
+      // Render KaTeX formula typesetting and copy buttons once streaming completes
+      renderContentWithMath(contentDiv, fullResponseText);
+
+      conversationHistory.push({role: 'assistant', content: fullResponseText});
       loadSessions();
 
     } catch (err) {
@@ -483,6 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadHistory(sessionId) {
+    if (!chatBox) return;
     chatBox.innerHTML = '';
     conversationHistory = [];
 
@@ -506,10 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
       history.forEach((item) => {
         appendUserMessage(item.user_message);
         appendBotMessage(item.ai_response);
-        conversationHistory.push(
-            {role: 'user', content: item.user_message});
-        conversationHistory.push(
-            {role: 'assistant', content: item.ai_response});
+        conversationHistory.push({role: 'user', content: item.user_message});
+        conversationHistory.push({role: 'assistant', content: item.ai_response});
       });
     } catch (err) {
       console.error('Failed to load history:', err);
